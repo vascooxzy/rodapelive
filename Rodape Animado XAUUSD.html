@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rodapé Animado XAUUSD</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: 'Montserrat', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+    .preview-container {
+      width: 100%;
+      max-width: 1080px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .instructions {
+      font-size: 13px;
+      color: #71717a;
+      letter-spacing: 0.5px;
+      display: flex;
+      justify-content: space-between;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .instructions span {
+      color: #00E5FF;
+    }
+
+    /* O RODAPÉ (Tamanho base TikTok 1080px) */
+    .ticker-bar {
+      position: relative;
+      width: 100%;
+      height: 180px;
+      background: #05070a;
+      border: 1px solid #142834;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Linha laser ciano no topo */
+    .top-laser {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: #00E5FF;
+      box-shadow: 0 0 16px #00E5FF, 0 0 4px #fff;
+    }
+
+    /* Linha base */
+    .bottom-border {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #18222d;
+    }
+
+    /* BLOCO FIXO À ESQUERDA: Logo + Tag XAUUSD */
+    .brand-slot {
+      position: relative;
+      z-index: 2;
+      width: 240px;
+      min-width: 240px;
+      background: #05070a;
+      border-right: 1px solid #142834;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      box-shadow: 12px 0 24px rgba(0, 0, 0, 0.8);
+    }
+    .brand-slot img {
+      max-width: 170px;
+      max-height: 95px;
+      object-fit: contain;
+      filter: drop-shadow(0 0 10px rgba(0, 229, 255, 0.25));
+    }
+    .brand-tag {
+      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: #00E5FF;
+      text-transform: uppercase;
+    }
+    .live-dot {
+      width: 7px;
+      height: 7px;
+      background: #00E5FF;
+      border-radius: 50%;
+      box-shadow: 0 0 8px #00E5FF;
+      animation: pulse 1.6s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.35; transform: scale(0.75); }
+    }
+
+    /* BLOCO DIREITO: Conteúdo animado */
+    .content-area {
+      position: relative;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+      background: linear-gradient(90deg, #05070a 0%, #090e14 100%);
+    }
+
+    /* Ticker superior rotativo (Comunidade vs Aconselhamento) */
+    .ticker-main {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+      padding: 0 28px;
+    }
+    .slide-group {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    }
+    .slide-group.active {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* Layout da Comunidade */
+    .headline-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 6px;
+    }
+    .badge-check {
+      width: 28px;
+      height: 28px;
+      border: 2px solid #00E5FF;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.4);
+    }
+    .badge-check svg {
+      width: 14px;
+      height: 14px;
+      stroke: #fff;
+      stroke-width: 3.5;
+      fill: none;
+    }
+    .headline-text {
+      font-size: 26px;
+      font-weight: 900;
+      letter-spacing: 0.5px;
+      color: #ffffff;
+      text-transform: uppercase;
+    }
+    .subline-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 17px;
+      font-weight: 700;
+    }
+    .sub-cyan {
+      color: #00E5FF;
+    }
+    .sub-white {
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+    .arrow-indicator {
+      display: inline-flex;
+      align-items: center;
+      animation: nudge 1.2s infinite ease-in-out;
+    }
+    .arrow-indicator svg {
+      width: 22px;
+      height: 14px;
+      stroke: #00E5FF;
+      stroke-width: 3;
+      fill: none;
+    }
+    @keyframes nudge {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(6px); }
+    }
+
+    /* Layout do Aviso Legal */
+    .disclaimer-headline {
+      font-size: 20px;
+      font-weight: 900;
+      color: #00E5FF;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 4px;
+    }
+    .disclaimer-badge {
+      background: #00E5FF;
+      color: #000;
+      font-size: 11px;
+      font-weight: 900;
+      padding: 2px 7px;
+      letter-spacing: 1px;
+    }
+    .disclaimer-body {
+      font-size: 15px;
+      font-weight: 700;
+      color: #e4e4e7;
+      line-height: 1.3;
+    }
+
+    /* Faixa de rolagem contínua inferior (Marquee) */
+    .marquee-bar {
+      height: 38px;
+      background: #010204;
+      border-top: 1px solid #142834;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      white-space: nowrap;
+      position: relative;
+    }
+    .marquee-track {
+      display: inline-flex;
+      animation: scrollLeft 28s linear infinite;
+    }
+    .marquee-item {
+      display: inline-flex;
+      align-items: center;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      padding: 0 18px;
+      color: #a1a1aa;
+    }
+    .marquee-item b {
+      color: #fff;
+      font-weight: 900;
+      margin: 0 4px;
+    }
+    .marquee-item .cyan {
+      color: #00E5FF;
+    }
+    .marquee-sep {
+      display: inline-block;
+      width: 5px;
+      height: 5px;
+      background: #00E5FF;
+      margin: 0 14px;
+    }
+    @keyframes scrollLeft {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* Guia de uso */
+    .guide-box {
+      background: #090e14;
+      border: 1px solid #142834;
+      padding: 16px 20px;
+      border-radius: 4px;
+      font-size: 13px;
+      line-height: 1.6;
+      color: #a1a1aa;
+    }
+    .guide-box h4 {
+      color: #00E5FF;
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+      letter-spacing: 0.8px;
+    }
+    .guide-box ol {
+      padding-left: 20px;
+    }
+    .guide-box li {
+      margin-bottom: 4px;
+    }
+    .guide-box code {
+      background: #000;
+      color: #fff;
+      padding: 2px 6px;
+      font-family: monospace;
+      border: 1px solid #222;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="preview-container">
+    <div class="instructions">
+      <div>Overlay Animado para TikTok Studio <span>[1080 × 180]</span></div>
+      <div>XAUUSD • HTML / CSS</div>
+    </div>
+
+    <!-- RODAPÉ PRINCIPAL -->
+    <div class="ticker-bar" id="rodapé-overlay">
+      <div class="top-laser"></div>
+
+      <!-- Logótipo TL.PT + Tag -->
+      <div class="brand-slot">
+        <img src="https://cdn.abacus.ai/images/e65f849f-c310-41e2-8708-865f9a793bc0.png" alt="TL.PT Logo">
+        <div class="brand-tag">
+          <span class="live-dot"></span>
+          <span>XAUUSD LIVE</span>
+        </div>
+      </div>
+
+      <!-- Zona de Conteúdo com animação -->
+      <div class="content-area">
+
+        <!-- Slides rotativos no topo -->
+        <div class="ticker-main">
+
+          <!-- SLIDE 1: COMUNIDADE -->
+          <div class="slide-group active" id="slide-1">
+            <div class="headline-row">
+              <span class="badge-check">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+              </span>
+              <span class="headline-text">COMUNIDADE GRATUITA !</span>
+            </div>
+            <div class="subline-row">
+              <span class="sub-cyan">Mini-curso gratuito e Dúvidas:</span>
+              <span class="sub-white">Link NA BIO</span>
+              <span class="arrow-indicator">
+                <svg viewBox="0 0 32 16">
+                  <path d="M0 8h26M20 2l6 6-6 6"></path>
+                </svg>
+              </span>
+            </div>
+          </div>
+
+          <!-- SLIDE 2: AVISO LEGAL & EDUCACIONAL -->
+          <div class="slide-group" id="slide-2">
+            <div class="disclaimer-headline">
+              <span class="disclaimer-badge">AVISO</span>
+              <span>CONTEÚDO ESTRITAMENTE EDUCACIONAL</span>
+            </div>
+            <div class="disclaimer-body">
+              Operações em <b>XAUUSD</b> envolvem risco de capital. 
+              <span style="color:#00E5FF; font-weight:800;">Isto não é recomendação ou aconselhamento financeiro.</span>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Barra inferior marquee contínua -->
+        <div class="marquee-bar">
+          <div class="marquee-track">
+            <!-- Bloco 1 -->
+            <span class="marquee-item"><span class="cyan">●</span>  <b>XAUUSD</b> LIVE TRADING</span>
+            <span class="marquee-sep"></span>
+            <span class="marquee-item">COMUNIDADE 100% GRATUITA</span>
+            <span class="marquee-sep"></span>
+            <span class="marquee-item">ACEDE PELO <b>LINK NA BIO</b></span>
+            <span class="marquee-sep"></span>
+            <span class="marquee-item"><span class="cyan">ATENÇÃO:</span> CONTEÚDO APENAS EDUCACIONAL</span>
+            <span class="marquee-sep"></span>
+            <span class="marquee-item">NÃO CONSTITUI ACONSELHAMENTO FINANCEIRO</span>
+            <span class="marquee-sep"></span>
+
+            <!-- Bloco duplicado para loop infinito fluído -->
+            <span class="marquee-item"><span class="cyan">●</span>  <b>XAUUSD</b> LIVE TRADING</span>
+            <span class="marquee-sep"></span>
+            <span class="marquee-item">COMUNIDADE 100% GRATUITA</span>
+            <span class="marquee-sep"></span>
+            <span class="marquee-item">ACEDE PELO <b>LINK NA BIO</b></span>
+            <span class="marquee-sep"></span>
+            <span class="marquee-item"><span class="cyan">ATENÇÃO:</span> CONTEÚDO APENAS EDUCACIONAL</span>
+            <span class="marquee-sep"></span>
+            <span class="marquee-item">NÃO CONSTITUI ACONSELHAMENTO FINANCEIRO</span>
+            <span class="marquee-sep"></span>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bottom-border"></div>
+    </div>
+
+    <!-- Guia de Integração rápida -->
+    <div class="guide-box">
+      <h4>Como colocar no TikTok Studio ou OBS:</h4>
+      <ol>
+        <li>Adiciona uma nova fonte do tipo <code>Navegador / Browser Source</code>.</li>
+        <li>Define a resolução para <code>1080</code> de largura por <code>180</code> de altura.</li>
+        <li>Se usares como ficheiro local, grava o código como <code>rodape.html</code> e marca "Ficheiro Local" na fonte.</li>
+        <li>Posiciona no fundo da tela da live. A barra inferior corre em loop e os slides centrais alternam automaticamente a cada 6 segundos.</li>
+      </ol>
+    </div>
+  </div>
+
+  <script>
+    // Alterna os slides a cada 6 segundos
+    const slides = [
+      document.getElementById('slide-1'),
+      document.getElementById('slide-2')
+    ];
+    let current = 0;
+    setInterval(() => {
+      slides[current].classList.remove('active');
+      current = (current + 1) % slides.length;
+      slides[current].classList.add('active');
+    }, 6000);
+  </script>
+</body>
+</html>
